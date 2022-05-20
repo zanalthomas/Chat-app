@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>socket io</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js" integrity="sha512-9mpsATI0KClwt+xVZfbcf2lJ8IFBAwsubJ6mI3rtULwyM3fBmQFzj0It4tGqxLOGQwGfJdk/G+fANnxfq9/cew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+<body>
+<form id="frm">
+	<input type="text" name="message" id="message">
+	<input type="button" onclick="sendmessage()" value="send" id="submit">
+ <h1 id="view">
+ 	
+ </h1>
+</form>
+</body>
+<script type="text/javascript">
+    let name=prompt("your name here");
+
+    let content=(document.getElementById("view"));
+
+    let username="";
+	const socket = io("/");
+
+document.getElementById("frm").addEventListener("submit", function(event){
+  event.preventDefault();
+  sendmessage();
+});
+
+    socket.emit("user-ready",name);
+	socket.on("connect",()=>{
+		console.log(socket.id);
+	})
+socket.on("current-user",(data)=>{
+ username=data;
+})
+function sendmessage()
+{
+  let mess= document.getElementById("message").value;
+  socket.emit("message-send",mess);
+  document.getElementById("message").value="";
+}
+	socket.on("message-send",(obj)=>{
+		if(obj.user==username){
+			document.getElementById("view").innerHTML=(document.getElementById("view").innerHTML)+("<br/>you"+":"+obj.data);
+		}
+		else{
+		document.getElementById("view").innerHTML=(document.getElementById("view").innerHTML)+("<br/>"+obj.user+":"+obj.data);
+	}
+	})
+
+	socket.on("user-join",(data)=>{
+		if(data.user==username){
+		    data.messages.forEach((values)=>{
+		    	if(values.user==username){
+		    		content.innerHTML=content.innerHTML+"<br/>you"+" : "+values.message;
+		    	}
+		    	else{
+		    	content.innerHTML=content.innerHTML+"<br/>"+values.user+" : "+values.message;
+		    }
+		    })
+		    content.innerHTML=content.innerHTML+"<br/> you"+" joined";
+		}
+		else{
+		content.innerHTML=content.innerHTML+"<br/>"+data.user+" joined";
+	}
+	})
+</script>
+</html>
