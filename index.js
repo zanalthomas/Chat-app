@@ -6,8 +6,15 @@ const mongo=require("mongodb").MongoClient;
 const con="mongodb+srv://sanalthomas:AtLiNOaI57Fu2GnU@sanalcluster.fqtcd.mongodb.net/?retryWrites=true&w=majority";
 
 
+/*
+const io=require("socket.io")(3000,{
+	cors:{
+		url:["http://localhost:8000"],
+	},
+});
+*/
 
-const io=require("socket.io")(3000);
+const io=require("socket.io")(server);
 
 users=[];
 
