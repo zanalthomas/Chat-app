@@ -2,9 +2,12 @@ const express=require("express");
 const app=express();
 const server=require("http").Server(app);
 const mongo=require("mongodb").MongoClient;
-
+//const con="mongodb://localhost:27017";
 const con="mongodb+srv://sanalthomas:AtLiNOaI57Fu2GnU@sanalcluster.fqtcd.mongodb.net/?retryWrites=true&w=majority";
 
+
+
+const io=require("socket.io")(3000);
 
 users=[];
 
@@ -44,3 +47,4 @@ app.get("/",(req,res)=>{
 })
 
 server.listen(PORT);
+//app.listen(PORT);
