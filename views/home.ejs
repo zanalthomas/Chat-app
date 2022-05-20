@@ -3,24 +3,153 @@
 <head>
 	<title>socket io</title>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.1/socket.io.js" integrity="sha512-9mpsATI0KClwt+xVZfbcf2lJ8IFBAwsubJ6mI3rtULwyM3fBmQFzj0It4tGqxLOGQwGfJdk/G+fANnxfq9/cew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/js/bootstrap.min.js" integrity="sha384-a5N7Y/aK3qNeh15eJKGWxsqtnX/wWdSZSKp+81YjTmS15nvnvxKHuzaWwXHDli+4" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.3/css/bootstrap.min.css" integrity="sha384-Zug+QiDoJOrZ5t4lssLdxGhVrurbmBWopoEl+M6BdEfwnCJZtKxi1KgxUyJq13dy" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style type="text/css">
+	body{
+font-family: 'Raleway', sans-serif;
+background: #E9ECE9;
+}
+.comments-main{
+background: #FFF;
+}
+.comment time, .comment:hover time,.icon-rocknroll, .like-count {
+-webkit-transition: .25s opacity linear;
+transition: .25s opacity linear;
+}
+.comments-main ul li{
+list-style: none;
+}
+.comments .comment {
+padding: 5px 10px;
+background: #00AF90;
+}
+
+.mycomment {
+padding: 5px 10px;
+background: #8200BE;
+}
+.mycomment time, .mycomment:hover time,.icon-rocknroll, .like-count {
+-webkit-transition: .25s opacity linear;
+transition: .25s opacity linear;
+}
+
+.mycomment:hover time{
+opacity: 1;
+}
+
+.mycomment h4 {
+display: inline-block;
+font-size: 16px;
+}
+
+.mycomment h4 a {
+color: #CECC03;
+text-decoration: none;
+}
+
+ .mycomment time {
+font-size: .75rem;
+opacity: 0;
+}
+
+.comments .comment:hover time{
+opacity: 1;
+}
+.comments .user-img img {
+width: 50px;
+height: 50px;
+}
+.comments .comment h4 {
+display: inline-block;
+font-size: 16px;
+}
+.comments .comment h4 a {
+color: #404040;
+text-decoration: none;
+}
+.comments .comment .icon-rocknroll {
+color: #545454;
+font-size: .85rem;
+}
+.comments .comment .icon-rocknroll:hover {
+opacity: .5;
+}
+.comments .comment time,.comments .comment .like-count,.comments .comment .icon-rocknroll {
+font-size: .75rem;
+opacity: 0;
+}
+.comments .comment time, .comments .comment .like-count {
+font-weight: 300;
+}
+.comments .comment p {
+font-size: 13px;
+}
+.comments .comment p .reply {
+color: #BFBFA8;
+cursor: pointer;
+}
+.comments .comment .active {
+opacity: 1;
+}
+.icon-rocknroll {
+background: none;
+outline: none;
+cursor: pointer;
+margin: 0 .125rem 0 0;
+}
+.comments .comment:hover .icon-rocknroll,.comments .comment:hover .like-count {
+opacity: 1;
+}
+.comment-box-main{
+background: #CA1D5F;
+}
+@media (min-width: 320px) and (max-width: 480px){
+.comments .comment h4 {
+font-size: 12px;
+}
+.comments .comment p{
+font-size: 11px;
+}
+.comment-box-main .send-btn button{
+margin-left: 5px;
+}
+}
+</style>
 </head>
 <body>
+	<div class="container">
+<div class="row mt-5">
+<div class="col-md-8 mx-auto offset-md-3 col-sm-12 offset-sm-3 col-12 comments-main pt-4 rounded">
+
+<ul class="p-0">
+<section id="view">
+
+</section>
+</ul>
 <form id="frm">
-	<input type="text" name="message" id="message">
-	<input type="button" onclick="sendmessage()" value="send" id="submit">
- <h1 id="view">
- 	
- </h1>
+<div class="row comment-box-main p-3 rounded-bottom">
+<div class="col-md-9 col-sm-9 col-9 pr-0 comment-box">
+<input type="text" class="form-control" name="message" id="message">
+</div>
+<div class="col-md-3 col-sm-2 col-2 pl-0 text-center send-btn">
+<input type="button" class="btn btn-info" onclick="sendmessage()" value="send" id="submit">
+</div>
+</div>
 </form>
+</div>
+</div>
+</div>
 </body>
 <script type="text/javascript">
     let name=prompt("your name here");
 
     let content=(document.getElementById("view"));
-
+	let audio = new Audio('/views/sound/popup.wav');
     let username="";
-	const socket = io("/");
-
+	//const socket = io("/");
+const socket = io("http://localhost:3000");
 document.getElementById("frm").addEventListener("submit", function(event){
   event.preventDefault();
   sendmessage();
@@ -38,13 +167,17 @@ function sendmessage()
   let mess= document.getElementById("message").value;
   socket.emit("message-send",mess);
   document.getElementById("message").value="";
+          audio.play();
+  window.scrollTo(0, document.querySelector("#view").scrollHeight);
 }
 	socket.on("message-send",(obj)=>{
 		if(obj.user==username){
-			document.getElementById("view").innerHTML=(document.getElementById("view").innerHTML)+("<br/>you"+":"+obj.data);
+
+			document.getElementById("view").innerHTML=(document.getElementById("view").innerHTML)+("<li><div class='row comments mb-2'><div class='col-md-2 col-sm-2 col-3 text-center user-img'><img id='profile-photo' src='views/img/admin.svg' class='rounded-circle'/></div><div class='col-md-9 col-sm-9 col-9 mycomment rounded mb-2'><h4 class='m-0'><a href='#'>you</a></h4><time class='text-white ml-3'>1 hours ago</time><like></like><p class='mb-0 text-white'>"+obj.data+"</p></div></div></li>");
 		}
 		else{
-		document.getElementById("view").innerHTML=(document.getElementById("view").innerHTML)+("<br/>"+obj.user+":"+obj.data);
+		document.getElementById("view").innerHTML=(document.getElementById("view").innerHTML)+("<li><div class='row comments mb-2'><div class='col-md-2 col-sm-2 col-3 text-center user-img'><img id='profile-photo' src='views/img/admin.svg' class='rounded-circle'/></div><div class='col-md-9 col-sm-9 col-9 comment rounded mb-2'><h4 class='m-0'><a href='#'>"+obj.user+"</a></h4><time class='text-white ml-3'>1 hours ago</time><like></like><p class='mb-0 text-white'>"+obj.data+"</p></div></div></li><br/>");
+		window.scrollTo(0, document.querySelector("#view").scrollHeight);
 	}
 	})
 
@@ -52,16 +185,16 @@ function sendmessage()
 		if(data.user==username){
 		    data.messages.forEach((values)=>{
 		    	if(values.user==username){
-		    		content.innerHTML=content.innerHTML+"<br/>you"+" : "+values.message;
+		    		content.innerHTML=content.innerHTML+"<li><div class='row comments mb-2'><div class='col-md-2 col-sm-2 col-3 text-center user-img'><img id='profile-photo' src='views/img/admin.svg' class='rounded-circle'/></div><div class='col-md-9 col-sm-9 col-9 mycomment rounded mb-2'><h4 class='m-0'><a href='#'>you</a></h4><time class='text-white ml-3'>1 hours ago</time><like></like><p class='mb-0 text-white'>"+values.message+"</p></div></div></li>";
 		    	}
 		    	else{
-		    	content.innerHTML=content.innerHTML+"<br/>"+values.user+" : "+values.message;
+		    	content.innerHTML=content.innerHTML+"<li><div class='row comments mb-2'><div class='col-md-2 col-sm-2 col-3 text-center user-img'><img id='profile-photo' src='views/img/admin.svg' class='rounded-circle'/></div><div class='col-md-9 col-sm-9 col-9 comment rounded mb-2'><h4 class='m-0'><a href='#'>"+values.user+"</a></h4><time class='text-white ml-3'>1 hours ago</time><like></like><p class='mb-0 text-white'>"+values.message+"</p></div></div></li>";
 		    }
 		    })
-		    content.innerHTML=content.innerHTML+"<br/> you"+" joined";
+		    content.innerHTML=content.innerHTML+"<div class='row '><div class='col-lg-3 mx-auto '> you"+" joined</div></div>";
 		}
 		else{
-		content.innerHTML=content.innerHTML+"<br/>"+data.user+" joined";
+		content.innerHTML=content.innerHTML+"<div class='row my-2'><div class='col-lg-3 mx-auto  rounded '>"+data.user+" joined</div></div>";
 	}
 	})
 </script>

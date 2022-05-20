@@ -1,14 +1,21 @@
 const express=require("express");
 const app=express();
-const server=require("http").Server(app);
+//const server=require("http").Server(app);
 const mongo=require("mongodb").MongoClient;
-const con="mongodb+srv://sanalthomas:AtLiNOaI57Fu2GnU@sanalcluster.fqtcd.mongodb.net/?retryWrites=true&w=majority";
+const con="mongodb://localhost:27017";
+//const con="mongodb+srv://sanalthomas:AtLiNOaI57Fu2GnU@sanalcluster.fqtcd.mongodb.net/?retryWrites=true&w=majority";
 
-const io=require("socket.io")(server);
+const io=require("socket.io")(3000,{
+	cors:{
+		url:["http://localhost:8000"],
+	},
+});
 
 users=[];
 
 PORT=process.env.PORT || 8000;
+
+app.use("/", express.static(__dirname + "/"));
 
 app.set("view engine","ejs");
 
@@ -18,7 +25,6 @@ io.on("connect",(socket)=>{
  	socket.emit("current-user",data);
  	 mongo.connect(con,{useUnifiedTopology:true},(err,client)=>{
  	 	if(err) throw err;
- 	 	console.log(client);
  		var db=client.db("chatapp");
 		db.collection("messages").find({}).toArray(function(err, result) {
 			 socket.broadcast.emit("user-join",{messages:result,user:data});
@@ -43,4 +49,4 @@ app.get("/",(req,res)=>{
 })
 
 
-server.listen(PORT);
+app.listen(PORT);
